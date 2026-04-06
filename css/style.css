@@ -832,15 +832,7 @@ body {
   margin-bottom: 14px;
 }
 
-.dropbox-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #44A194;
-  flex-shrink: 0;
-}
-
-.dropbox-status span {
+.dropbox-status-icon {\n  font-size: 1.1rem;\n  flex-shrink: 0;\n  line-height: 1;\n}\n\n.dropbox-status span {
   flex: 1;
   font-size: 0.85rem;
   font-weight: 600;

@@ -26,6 +26,14 @@
     <small>Safari → Share → <em>Add to Home Screen</em> &nbsp;|&nbsp; Chrome → ⋮ → <em>Add to Home screen</em></small></span>
     <button class="tip-close" onclick="dismissTip()" aria-label="Close tip">✕</button>
   </div>
+  <script>
+    function dismissTip() {
+      var b = document.getElementById('tip-banner');
+      if (b) b.style.display = 'none';
+      try { localStorage.setItem('tip_dismissed', '1'); } catch(e) {}
+    }
+    if (localStorage.getItem('tip_dismissed') === '1') dismissTip();
+  </script>
 
 
   <!-- ══════════════════════════════════════════════
@@ -231,7 +239,7 @@
       <!-- State B: connected -->
       <div id="dropbox-connected" class="dropbox-section" style="display:none">
         <div class="dropbox-status">
-          <span class="dropbox-dot"></span>
+          <span class="dropbox-status-icon">✅</span>
           <span id="dropbox-user-name">Connected to Dropbox</span>
           <button class="dropbox-disconnect" onclick="disconnectDropbox()">Disconnect</button>
         </div>

@@ -11,24 +11,6 @@ const APP_STORAGE_KEYS = [
   'tip_dismissed',
 ];
 
-
-/* ── Tip Banner ────────────────────────────────────────── */
-
-function dismissTip() {
-  const banner = document.getElementById('tip-banner');
-  if (banner) banner.style.display = 'none';
-  localStorage.setItem('tip_dismissed', '1');
-}
-
-(function initTip() {
-  if (localStorage.getItem('tip_dismissed') === '1') {
-    document.addEventListener('DOMContentLoaded', () => {
-      const banner = document.getElementById('tip-banner');
-      if (banner) banner.style.display = 'none';
-    });
-  }
-})();
-
 // Category colors — used by expense cards and the pie chart
 const CATEGORY_COLORS = {
   Food:          '#EC8F8D',
