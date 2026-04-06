@@ -239,16 +239,23 @@ async function importFromDropbox() {
         'Authorization': `Bearer ${token}`,
         'Content-Type':  'application/json'
       },
-      body: JSON.stringify({ path: folder, limit: 100 })
+      body: JSON.stringify({
+        path: folder,
+        limit: 100,
+        include_non_downloadable_file_results: false
+      })
     });
 
     if (!listRes.ok) {
+      const errText = await listRes.text();
+      console.error('Dropbox list_folder error:', listRes.status, errText);
+
       if (listRes.status === 401) {
         localStorage.removeItem(DROPBOX_TOKEN_KEY);
         updateDropboxUI();
         showToast('❌ Session expired. Please reconnect Dropbox.');
-      } else if (listRes.status === 409) {
-        showToast('❌ Folder not found. Check the folder name.');
+      } else if (listRes.status === 409 || listRes.status === 400) {
+        showToast('❌ Folder not found. Check the folder name and try again.');
       } else {
         showToast(`❌ Could not list folder (${listRes.status})`);
       }
