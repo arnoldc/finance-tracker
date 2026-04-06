@@ -14,6 +14,7 @@ const CATEGORY_COLORS = {
   Entertainment: '#b794f4',
   Shopping:      '#f687b3',
   Service:       '#4fd1c5',
+  Loans:         '#f6e05e',
   Other:         '#a0aec0',
 };
 
@@ -72,7 +73,7 @@ function showTab(tabName, clickedBtn) {
   }
 
   if (tabName === 'export') {
-    renderExportSummary();
+    updateDropboxUI();
   }
 }
 
@@ -217,32 +218,6 @@ function updateStats() {
 }
 
 
-/* ── Render Export Summary ────────────────────────────────── */
-
-function renderExportSummary() {
-  const expenses = loadExpenses();
-  const total    = expenses.reduce((sum, e) => sum + e.amount, 0);
-
-  // Tally by category
-  const byCategory = {};
-  expenses.forEach(e => {
-    byCategory[e.category] = (byCategory[e.category] || 0) + e.amount;
-  });
-
-  const categoryLines = Object.entries(byCategory)
-    .sort((a, b) => b[1] - a[1])
-    .map(([cat, amt]) => `<div>${cat}: <strong>$${amt.toFixed(2)}</strong></div>`)
-    .join('');
-
-  document.getElementById('export-summary').innerHTML = `
-    <div>Total entries: <strong>${expenses.length}</strong></div>
-    <div>Grand total: <strong>$${total.toFixed(2)}</strong></div>
-    <hr>
-    ${categoryLines || '<em style="color:#a0aec0">No data yet</em>'}
-  `;
-}
-
-
 /* ── Export to CSV ────────────────────────────────────────── */
 
 function exportCSV() {
@@ -286,7 +261,6 @@ function clearAll() {
 
   localStorage.removeItem(STORAGE_KEY);
   renderExpenseList();
-  renderExportSummary();
   showToast('All data cleared');
 }
 

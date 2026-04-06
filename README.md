@@ -13,7 +13,7 @@ Log expenses on your phone, export as CSV, and import into Excel.
 
 ## How to Use
 
-1. Open `index.html` in your browser (or host it on GitHub Pages)
+1. Open `index.html` in your browser
 2. Add expenses using the form
 3. Use the 📷 scanner button to scan a receipt amount
 4. Export as CSV from the Export tab, then import into `Expense-Tracker.xlsx`
@@ -37,9 +37,3 @@ expense-tracker/
 - Vanilla HTML / CSS / JavaScript
 - [Tesseract.js](https://github.com/naptha/tesseract.js) for OCR (receipt scanning)
 - localStorage for data persistence
-
-## Deployment (GitHub Pages)
-
-1. Push this folder to a GitHub repository
-2. Go to Settings → Pages → Source: `main` branch, `/ (root)`
-3. Your app will be live at `https://your-username.github.io/expense-tracker`

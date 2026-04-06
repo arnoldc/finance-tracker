@@ -72,6 +72,7 @@
           <option value="Entertainment">🎬 Entertainment</option>
           <option value="Shopping">🛍️ Shopping</option>
           <option value="Service">🧹 Service</option>
+          <option value="Loans">💰 Loans</option>
           <option value="Other">📦 Other</option>
         </select>
       </div>
@@ -81,9 +82,6 @@
         <select class="form-select" id="inp-payment">
           <option value="Cash">💵 Cash</option>
           <option value="Credit Card">💳 Credit Card</option>
-          <option value="Debit Card">🏦 Debit Card</option>
-          <option value="Bank Transfer">🔁 Bank Transfer</option>
-          <option value="Other">📱 Other / E-wallet</option>
         </select>
       </div>
 
@@ -151,6 +149,7 @@
         <option value="Entertainment">Entertainment</option>
         <option value="Shopping">Shopping</option>
         <option value="Service">Service</option>
+        <option value="Loans">Loans</option>
         <option value="Other">Other</option>
       </select>
       <select class="form-select" id="filter-month" onchange="renderExpenseList()">
@@ -169,28 +168,64 @@
   ══════════════════════════════════════════════ -->
   <section id="tab-export" class="section">
 
+    <!-- Download CSV -->
     <div class="card">
-      <p class="card-title">Export to Excel</p>
+      <p class="card-title">Download CSV</p>
 
       <div class="info-box blue">
-        📌 <strong>How it works</strong><br>
-        1. Tap <em>Export CSV</em> to download your expenses<br>
+        📌 <strong>How to import into Excel</strong><br>
+        1. Tap <em>Download CSV</em> below<br>
         2. Open Excel → Data → From Text/CSV<br>
-        3. Select the downloaded file → Load<br>
-        Your data will appear ready to use!
+        3. Select the downloaded file → Load
       </div>
 
-      <button class="btn btn-success" onclick="exportCSV()">📥 Export All as CSV</button>
-      <button class="btn btn-danger"  onclick="clearAll()">🗑️ Clear All Data</button>
+      <button class="btn btn-success" onclick="exportCSV()">📥 Download CSV</button>
+    </div>
 
-      <div class="info-box yellow" style="margin-top: 14px;">
-        ⚠️ Data is stored on this device only. Export regularly to avoid data loss.
+    <!-- Dropbox -->
+    <div class="card">
+      <p class="card-title">Save to Dropbox</p>
+
+      <!-- State A: not connected -->
+      <div id="dropbox-setup" class="dropbox-section">
+        <div class="info-box blue">
+          🔗 Connect your Dropbox to save CSVs directly to your cloud folder.<br><br>
+          <strong>One-time setup:</strong><br>
+          1. Go to <strong>dropbox.com/developers/apps</strong><br>
+          2. Create App → Scoped → Full Dropbox → any name<br>
+          3. Under <em>OAuth 2</em> → add <code>Redirect URI</code>:<br>
+          &nbsp;&nbsp;<code id="redirect-uri-display" style="font-size:0.78rem;word-break:break-all"></code><br>
+          4. Copy your <strong>App Key</strong> and paste it below
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dropbox-app-key">Dropbox App Key</label>
+          <input class="form-input" type="text" id="dropbox-app-key" placeholder="Paste your App Key here..." />
+        </div>
+        <button class="btn btn-dropbox" onclick="connectDropbox()">Connect Dropbox</button>
+      </div>
+
+      <!-- State B: connected -->
+      <div id="dropbox-connected" class="dropbox-section" style="display:none">
+        <div class="dropbox-status">
+          <span class="dropbox-dot"></span>
+          <span id="dropbox-user-name">Connected to Dropbox</span>
+          <button class="dropbox-disconnect" onclick="disconnectDropbox()">Disconnect</button>
+        </div>
+        <div class="form-group" style="margin-top:14px">
+          <label class="form-label">Save folder</label>
+          <input class="form-input" type="text" id="dropbox-folder" value="/ExpenseTracker" placeholder="/ExpenseTracker" />
+        </div>
+        <button class="btn btn-dropbox" onclick="exportToDropbox()">☁️ Save CSV to Dropbox</button>
       </div>
     </div>
 
+    <!-- Danger zone -->
     <div class="card">
-      <p class="card-title">Spending Summary</p>
-      <div class="export-summary" id="export-summary"></div>
+      <p class="card-title">Danger Zone</p>
+      <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear All Local Data</button>
+      <div class="info-box yellow" style="margin-top: 12px;">
+        ⚠️ This permanently deletes all expenses from this device.
+      </div>
     </div>
 
   </section>
@@ -245,6 +280,7 @@
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/scanner.js"></script>
+  <script src="js/dropbox.js"></script>
 
 </body>
 </html>

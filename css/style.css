@@ -656,3 +656,84 @@ body {
   min-width: 38px;
   text-align: right;
 }
+
+
+/* ── Loans Category ───────────────────────────────────────── */
+
+.expense-item[data-category="Loans"] { border-left-color: #f6e05e; }
+
+
+/* ── Dropbox Section ──────────────────────────────────────── */
+
+.btn-dropbox {
+  background: #0061FF;
+  color: white;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.btn-dropbox:active {
+  transform: scale(0.98);
+  opacity: 0.88;
+}
+
+.dropbox-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Connected status row */
+.dropbox-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0fff4;
+  border: 1px solid #c6f6d5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.dropbox-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #48bb78;
+  flex-shrink: 0;
+}
+
+.dropbox-status span {
+  flex: 1;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: #276749;
+}
+
+.dropbox-disconnect {
+  font-size: 0.75rem;
+  color: #fc8181;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.dropbox-disconnect:hover {
+  color: #e53e3e;
+}
+
+code {
+  background: #edf2f7;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+}
