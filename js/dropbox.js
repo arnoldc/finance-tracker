@@ -241,8 +241,7 @@ async function importFromDropbox() {
       },
       body: JSON.stringify({
         path: folder,
-        limit: 100,
-        include_non_downloadable_file_results: false
+        limit: 100
       })
     });
 
