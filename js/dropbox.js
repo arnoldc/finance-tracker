@@ -1,13 +1,11 @@
 /* ============================================================
    EXPENSE TRACKER — Dropbox Integration
-   Uses Dropbox OAuth 2 (PKCE) — no backend required.
-   The access token is stored in localStorage.
+   Uses the official Dropbox JS SDK (loaded via CDN in index.html)
+   with OAuth 2 implicit token flow. No backend required.
    ============================================================ */
 
 const DROPBOX_TOKEN_KEY  = 'dropbox_access_token';
 const DROPBOX_APPKEY_KEY = 'dropbox_app_key';
-const DROPBOX_API        = 'https://api.dropboxapi.com/2';
-const DROPBOX_CONTENT    = 'https://content.dropboxapi.com/2';
 
 
 /* ── Init — runs on every page load ──────────────────────── */
@@ -22,10 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const keyInput = document.getElementById('dropbox-app-key');
   if (savedKey && keyInput) keyInput.value = savedKey;
 
-  // Check if returning from OAuth redirect
+  // Check if returning from Dropbox OAuth redirect
   handleOAuthCallback();
 
-  // Check if already connected
+  // Refresh UI based on current connection state
   updateDropboxUI();
 });
 
@@ -37,10 +35,8 @@ function toggleDropboxKeyField() {
   const isOpen = field.style.display !== 'none';
 
   if (isOpen) {
-    // Field is visible — attempt to connect
     connectDropbox();
   } else {
-    // Show the field and change button label
     field.style.display = 'block';
     document.querySelector('#dropbox-setup .btn-dropbox').textContent = 'Submit & Connect';
     document.getElementById('dropbox-app-key').focus();
@@ -48,7 +44,7 @@ function toggleDropboxKeyField() {
 }
 
 
-/* ── OAuth: Connect ───────────────────────────────────────── */
+/* ── OAuth: Start Authorization Flow ─────────────────────── */
 
 function connectDropbox() {
   const appKey = document.getElementById('dropbox-app-key').value.trim();
@@ -58,27 +54,25 @@ function connectDropbox() {
     return;
   }
 
-  // Save App Key for later use
   localStorage.setItem(DROPBOX_APPKEY_KEY, appKey);
 
-  const redirectUri  = window.location.href.split('?')[0];
-  const authUrl = new URL('https://www.dropbox.com/oauth2/authorize');
+  // Build the Dropbox OAuth URL using the SDK's DropboxAuth helper
+  const dbxAuth = new Dropbox.DropboxAuth({ clientId: appKey });
 
-  authUrl.searchParams.set('client_id',      appKey);
-  authUrl.searchParams.set('response_type',  'token');
-  authUrl.searchParams.set('redirect_uri',   redirectUri);
-  authUrl.searchParams.set('token_access_type', 'legacy');
-
-  // Redirect to Dropbox login
-  window.location.href = authUrl.toString();
+  dbxAuth.getAuthenticationUrl(
+    window.location.href.split('?')[0],  // redirect URI
+    null,                                 // state
+    'token'                               // implicit flow — returns token in hash
+  ).then(authUrl => {
+    window.location.href = authUrl;
+  });
 }
 
 
-/* ── OAuth: Handle Callback ───────────────────────────────── */
+/* ── OAuth: Handle Redirect Callback ─────────────────────── */
 
 function handleOAuthCallback() {
-  // Dropbox returns the token in the URL hash after redirect
-  const hash   = window.location.hash;
+  const hash = window.location.hash;
   if (!hash.includes('access_token')) return;
 
   const params = new URLSearchParams(hash.replace('#', ''));
@@ -86,7 +80,6 @@ function handleOAuthCallback() {
 
   if (token) {
     localStorage.setItem(DROPBOX_TOKEN_KEY, token);
-    // Clean the token out of the URL bar
     window.history.replaceState(null, '', window.location.pathname);
     showToast('✅ Dropbox connected!');
   }
@@ -102,7 +95,7 @@ function disconnectDropbox() {
 }
 
 
-/* ── Update UI based on connection state ─────────────────── */
+/* ── Update UI: connected vs setup state ─────────────────── */
 
 function updateDropboxUI() {
   const token     = localStorage.getItem(DROPBOX_TOKEN_KEY);
@@ -122,36 +115,28 @@ function updateDropboxUI() {
 }
 
 
-/* ── Fetch and display the Dropbox account name ──────────── */
+/* ── Fetch Dropbox account name for display ──────────────── */
 
 async function fetchDropboxUsername(token) {
   try {
-    const res = await fetch(`${DROPBOX_API}/users/get_current_account`, {
-      method:  'POST',
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (!res.ok) {
-      // Token likely expired — clear it
+    const dbx  = new Dropbox.Dropbox({ accessToken: token });
+    const res  = await dbx.usersGetCurrentAccount();
+    const name = res.result?.name?.display_name || 'Dropbox';
+    document.getElementById('dropbox-user-name').textContent = `Connected as ${name}`;
+  } catch (err) {
+    // Token expired or revoked — reset to setup state
+    if (err.status === 401) {
       localStorage.removeItem(DROPBOX_TOKEN_KEY);
       updateDropboxUI();
-      return;
     }
-
-    const data = await res.json();
-    const name = data.name?.display_name || 'Dropbox';
-    document.getElementById('dropbox-user-name').textContent = `Connected as ${name}`;
-  } catch {
-    // Silent fail — name display is cosmetic only
   }
 }
 
 
-/* ── Export CSV to Dropbox ────────────────────────────────── */
+/* ── Export CSV directly to Dropbox ──────────────────────── */
 
 async function exportToDropbox() {
-  const token  = localStorage.getItem(DROPBOX_TOKEN_KEY);
-  const appKey = localStorage.getItem(DROPBOX_APPKEY_KEY);
+  const token = localStorage.getItem(DROPBOX_TOKEN_KEY);
 
   if (!token) {
     showToast('Please connect Dropbox first');
@@ -164,9 +149,9 @@ async function exportToDropbox() {
     return;
   }
 
-  // Build CSV content
-  const headers  = ['Date', 'Amount (₱)', 'Category', 'Payment Method', 'Description'];
-  const rows     = expenses
+  // Build CSV
+  const headers = ['Date', 'Amount (₱)', 'Category', 'Payment Method', 'Description'];
+  const rows    = expenses
     .sort((a, b) => a.date.localeCompare(b.date))
     .map(e => [
       e.date,
@@ -178,7 +163,7 @@ async function exportToDropbox() {
 
   const csvContent = [headers.join(','), ...rows].join('\n');
 
-  // Build destination path
+  // Build file path
   const folder   = (document.getElementById('dropbox-folder').value || '/ExpenseTracker').trim();
   const fileName = `expenses_${todayISO()}.csv`;
   const filePath = folder.replace(/\/$/, '') + '/' + fileName;
@@ -186,31 +171,24 @@ async function exportToDropbox() {
   showToast('⏳ Uploading to Dropbox...');
 
   try {
-    const res = await fetch(`${DROPBOX_CONTENT}/files/upload`, {
-      method: 'POST',
-      headers: {
-        Authorization:    `Bearer ${token}`,
-        'Content-Type':   'application/octet-stream',
-        'Dropbox-API-Arg': JSON.stringify({
-          path:       filePath,
-          mode:       'overwrite',
-          autorename: false,
-          mute:       false
-        })
-      },
-      body: csvContent
-    });
+    const dbx = new Dropbox.Dropbox({ accessToken: token });
 
-    if (!res.ok) {
-      const err = await res.json();
-      console.error('Dropbox upload error:', err);
-      showToast('❌ Upload failed. Check your App Key or folder path.');
-      return;
-    }
+    await dbx.filesUpload({
+      path:       filePath,
+      mode:       { '.tag': 'overwrite' },
+      contents:   csvContent
+    });
 
     showToast(`✅ Saved to Dropbox: ${filePath}`);
   } catch (err) {
-    console.error('Upload error:', err);
-    showToast('❌ Could not reach Dropbox. Check your connection.');
+    console.error('Dropbox upload error:', err);
+
+    if (err.status === 401) {
+      localStorage.removeItem(DROPBOX_TOKEN_KEY);
+      updateDropboxUI();
+      showToast('❌ Session expired. Please reconnect Dropbox.');
+    } else {
+      showToast('❌ Upload failed. Check your folder path and try again.');
+    }
   }
 }
