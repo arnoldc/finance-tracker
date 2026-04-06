@@ -171,31 +171,44 @@ async function exportToDropbox() {
   showToast('⏳ Uploading to Dropbox...');
 
   try {
-    const dbx  = new Dropbox.Dropbox({ accessToken: token });
-
-    // Dropbox SDK requires a Blob in browser environments, not a raw string
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-
-    await dbx.filesUpload({
-      path:       filePath,
-      mode:       { '.tag': 'overwrite' },
-      autorename: false,
-      mute:       false,
-      contents:   blob
+    // Use raw fetch for the upload — the SDK's filesUpload has issues
+    // in browser environments. The raw API is straightforward and reliable.
+    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization':   `Bearer ${token}`,
+        'Content-Type':    'application/octet-stream',
+        'Dropbox-API-Arg': JSON.stringify({
+          path:       filePath,
+          mode:       'overwrite',
+          autorename: false,
+          mute:       false
+        })
+      },
+      body: new Blob([csvContent], { type: 'application/octet-stream' })
     });
 
-    showToast(`✅ Saved to Dropbox: ${filePath}`);
-  } catch (err) {
-    console.error('Dropbox upload error:', err);
+    if (response.ok) {
+      showToast(`✅ Saved to Dropbox: ${filePath}`);
+      return;
+    }
 
-    if (err?.status === 401) {
+    // Handle known HTTP error codes
+    const errorText = await response.text();
+    console.error('Dropbox error:', response.status, errorText);
+
+    if (response.status === 401) {
       localStorage.removeItem(DROPBOX_TOKEN_KEY);
       updateDropboxUI();
       showToast('❌ Session expired. Please reconnect Dropbox.');
-    } else if (err?.status === 409) {
-      showToast('❌ Folder path not found. Check the folder name.');
+    } else if (response.status === 409) {
+      showToast('❌ Folder not found. Check the folder name and try again.');
     } else {
-      showToast('❌ Upload failed. Check your folder path and try again.');
+      showToast(`❌ Upload failed (${response.status}). Check console for details.`);
     }
+
+  } catch (err) {
+    console.error('Network error:', err);
+    showToast('❌ Could not reach Dropbox. Check your connection.');
   }
 }
