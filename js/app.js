@@ -4,18 +4,23 @@
 
 const STORAGE_KEY = 'expense_tracker_v1';
 const CURRENCY    = '₱';
+const APP_STORAGE_KEYS = [
+  STORAGE_KEY,
+  'dropbox_access_token',
+  'dropbox_app_key',
+];
 
 // Category colors — used by expense cards and the pie chart
 const CATEGORY_COLORS = {
-  Food:          '#f6ad55',
-  Transport:     '#68d391',
-  Bills:         '#fc8181',
-  Health:        '#76e4f7',
-  Entertainment: '#b794f4',
-  Shopping:      '#f687b3',
-  Service:       '#4fd1c5',
-  Loans:         '#f6e05e',
-  Other:         '#a0aec0',
+  Food:          '#EC8F8D',
+  Transport:     '#44A194',
+  Bills:         '#537D96',
+  Health:        '#76c4b8',
+  Entertainment: '#d4a49e',
+  Shopping:      '#e0b4a0',
+  Service:       '#7fb3a8',
+  Loans:         '#c4a96a',
+  Other:         '#b8b0a0',
 };
 
 
@@ -104,6 +109,50 @@ function addExpense() {
   document.getElementById('inp-date').value     = todayISO();
 
   showToast('✅ Expense saved!');
+}
+
+
+/* ── Edit Expense Amount ──────────────────────────────────── */
+
+function editExpenseAmount(id) {
+  const expenses = loadExpenses();
+  const expense  = expenses.find(e => e.id === id);
+  if (!expense) return;
+
+  const amountEl = document.getElementById('amount-' + id);
+  if (!amountEl) return;
+
+  // Replace the amount text with an inline input
+  const current = parseFloat(expense.amount).toFixed(2);
+  amountEl.innerHTML = `
+    <input type="number" class="edit-amount-input" id="edit-input-${id}"
+           value="${current}" min="0" step="0.01" inputmode="decimal" />
+    <div class="edit-amount-actions">
+      <button class="edit-save-btn" onclick="saveEditedAmount(${id})">✓</button>
+      <button class="edit-cancel-btn" onclick="cancelEditAmount(${id}, ${current})">✕</button>
+    </div>`;
+  document.getElementById('edit-input-' + id).focus();
+}
+
+function saveEditedAmount(id) {
+  const input = document.getElementById('edit-input-' + id);
+  const newAmount = parseFloat(input.value);
+  if (!newAmount || newAmount <= 0) return showToast('Enter a valid amount');
+
+  const expenses = loadExpenses();
+  const expense  = expenses.find(e => e.id === id);
+  if (!expense) return;
+
+  expense.amount = newAmount;
+  saveExpenses(expenses);
+  renderExpenseList();
+  updateStats();
+  showToast('✅ Amount updated — refresh the page to see changes everywhere');
+}
+
+function cancelEditAmount(id, original) {
+  const amountEl = document.getElementById('amount-' + id);
+  if (amountEl) amountEl.textContent = CURRENCY + parseFloat(original).toFixed(2);
 }
 
 
@@ -196,8 +245,11 @@ function buildExpenseCard(expense) {
         ${noteHTML}
       </div>
       <div class="expense-right">
-        <div class="expense-amount">$${parseFloat(expense.amount).toFixed(2)}</div>
-        <button class="delete-btn" onclick="deleteExpense(${expense.id})">✕ delete</button>
+        <div class="expense-amount" id="amount-${expense.id}">${CURRENCY}${parseFloat(expense.amount).toFixed(2)}</div>
+        <div class="expense-actions">
+          <button class="edit-btn" onclick="editExpenseAmount(${expense.id})">✎ edit</button>
+          <button class="delete-btn" onclick="deleteExpense(${expense.id})">✕ delete</button>
+        </div>
       </div>
     </div>`;
 }
@@ -256,12 +308,16 @@ function exportCSV() {
 /* ── Clear All Data ───────────────────────────────────────── */
 
 function clearAll() {
-  const confirmed = confirm('Clear all expense data? This cannot be undone.');
+  const confirmed = confirm('Clear all app data (expenses + Dropbox connection)? This cannot be undone.');
   if (!confirmed) return;
 
-  localStorage.removeItem(STORAGE_KEY);
+  APP_STORAGE_KEYS.forEach(key => localStorage.removeItem(key));
   renderExpenseList();
-  showToast('All data cleared');
+
+  // Keep export tab in sync if it is currently visible.
+  if (typeof updateDropboxUI === 'function') updateDropboxUI();
+
+  showToast('App data cleared');
 }
 
 

@@ -3,6 +3,8 @@
 A mobile-friendly expense tracker that runs entirely in your browser — no backend, no install.
 Log expenses on your phone, export as CSV, and import into Excel.
 
+https://arnoldc.github.io/finance-tracker/
+
 ## Features
 
 - Add expenses with date, amount, category, payment method, and notes

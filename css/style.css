@@ -10,33 +10,41 @@
 }
 
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f0f4f8;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #F4F0E4;
   color: #2d3748;
   min-height: 100vh;
   max-width: 480px;
   margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 
 /* ── Header ───────────────────────────────────────────────── */
 .app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #44A194 0%, #537D96 100%);
   color: white;
   padding: 28px 20px 20px;
   text-align: center;
 }
 
 .app-header h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  line-height: 1.2;
 }
 
 .app-header p {
-  font-size: 0.85rem;
-  opacity: 0.80;
-  margin-top: 5px;
+  font-size: 0.82rem;
+  font-weight: 400;
+  opacity: 0.75;
+  margin-top: 6px;
+  letter-spacing: 0.02em;
 }
 
 
@@ -44,7 +52,7 @@ body {
 .tab-nav {
   display: flex;
   background: white;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid #e5e0d4;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -55,19 +63,21 @@ body {
   flex: 1;
   padding: 14px 8px;
   text-align: center;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   color: #a0aec0;
   cursor: pointer;
   border: none;
   background: none;
   border-bottom: 3px solid transparent;
   transition: color 0.2s, border-color 0.2s;
+  font-family: inherit;
 }
 
 .tab-btn.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
+  color: #44A194;
+  border-bottom-color: #44A194;
 }
 
 .tab-btn:hover:not(.active) {
@@ -102,10 +112,10 @@ body {
 }
 
 .card-title {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.7rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: #a0aec0;
   margin-bottom: 18px;
 }
@@ -118,12 +128,12 @@ body {
 
 .form-label {
   display: block;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   color: #718096;
   margin-bottom: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
 }
 
 .form-input,
@@ -131,24 +141,26 @@ body {
 .form-textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid #e5e0d4;
   border-radius: 10px;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 500;
   color: #2d3748;
-  background: #f7fafc;
+  background: #faf8f2;
   transition: border-color 0.2s, background 0.2s;
   appearance: none;
   -webkit-appearance: none;
   font-family: inherit;
+  letter-spacing: 0.01em;
 }
 
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #44A194;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+  box-shadow: 0 0 0 3px rgba(68, 161, 148, 0.15);
 }
 
 .form-textarea {
@@ -168,7 +180,7 @@ body {
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #a0aec0;
   pointer-events: none;
 }
@@ -184,8 +196,9 @@ body {
   padding: 14px;
   border: none;
   border-radius: 10px;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
   cursor: pointer;
   font-family: inherit;
   transition: opacity 0.15s, transform 0.15s;
@@ -197,17 +210,17 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #44A194, #537D96);
   color: white;
 }
 
 .btn-success {
-  background: #48bb78;
+  background: #44A194;
   color: white;
 }
 
 .btn-danger {
-  background: #fc8181;
+  background: #EC8F8D;
   color: white;
 }
 
@@ -233,19 +246,21 @@ body {
 }
 
 .stat-card .stat-value {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #667eea;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #44A194;
   line-height: 1;
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-card .stat-label {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: #a0aec0;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 5px;
+  letter-spacing: 0.1em;
+  margin-top: 6px;
 }
 
 
@@ -278,37 +293,41 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #44A194;
 }
 
 /* Category color accents */
-.expense-item[data-category="Food"]          { border-left-color: #f6ad55; }
-.expense-item[data-category="Transport"]     { border-left-color: #68d391; }
-.expense-item[data-category="Bills"]         { border-left-color: #fc8181; }
-.expense-item[data-category="Health"]        { border-left-color: #76e4f7; }
-.expense-item[data-category="Entertainment"] { border-left-color: #b794f4; }
-.expense-item[data-category="Shopping"]      { border-left-color: #f687b3; }
-.expense-item[data-category="Service"]       { border-left-color: #4fd1c5; }
-.expense-item[data-category="Other"]         { border-left-color: #a0aec0; }
+.expense-item[data-category="Food"]          { border-left-color: #EC8F8D; }
+.expense-item[data-category="Transport"]     { border-left-color: #44A194; }
+.expense-item[data-category="Bills"]         { border-left-color: #537D96; }
+.expense-item[data-category="Health"]        { border-left-color: #76c4b8; }
+.expense-item[data-category="Entertainment"] { border-left-color: #d4a49e; }
+.expense-item[data-category="Shopping"]      { border-left-color: #e0b4a0; }
+.expense-item[data-category="Service"]       { border-left-color: #7fb3a8; }
+.expense-item[data-category="Other"]         { border-left-color: #b8b0a0; }
 
 .expense-info .expense-category {
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: 800;
+  font-size: 0.92rem;
   color: #2d3748;
+  letter-spacing: -0.2px;
 }
 
 .expense-info .expense-meta {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 500;
   color: #a0aec0;
   margin-top: 3px;
+  letter-spacing: 0.02em;
 }
 
 .expense-info .expense-note {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 400;
   color: #718096;
   margin-top: 5px;
   font-style: italic;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .expense-right {
@@ -318,26 +337,101 @@ body {
 }
 
 .expense-right .expense-amount {
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1.08rem;
+  font-weight: 900;
   color: #2d3748;
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
 }
 
 .expense-right .delete-btn {
-  font-size: 0.7rem;
-  color: #fc8181;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #EC8F8D;
   cursor: pointer;
   background: none;
   border: none;
   padding: 0;
-  margin-top: 6px;
   font-family: inherit;
-  display: block;
-  margin-left: auto;
+}
+
+.expense-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.edit-btn {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #44A194;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.edit-btn:hover {
+  color: #3a8d81;
 }
 
 .delete-btn:hover {
-  color: #e53e3e;
+  color: #d4706e;
+}
+
+/* ── Inline Edit Amount ───────────────────────────────────── */
+.edit-amount-input {
+  width: 80px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-align: right;
+  border: 1.5px solid #44A194;
+  border-radius: 6px;
+  padding: 3px 6px;
+  outline: none;
+  font-family: inherit;
+  color: #2d3748;
+  font-variant-numeric: tabular-nums;
+}
+
+.edit-amount-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.edit-save-btn,
+.edit-cancel-btn {
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.edit-save-btn {
+  background: #44A194;
+  color: white;
+}
+
+.edit-save-btn:hover {
+  background: #3a8d81;
+}
+
+.edit-cancel-btn {
+  background: #e5e0d4;
+  color: #718096;
+}
+
+.edit-cancel-btn:hover {
+  background: #d8d2c4;
 }
 
 
@@ -370,13 +464,13 @@ body {
 }
 
 .info-box.blue {
-  background: #ebf8ff;
-  color: #2b6cb0;
+  background: #e8f4f2;
+  color: #2d7a6f;
 }
 
 .info-box.yellow {
-  background: #fffaf0;
-  color: #744210;
+  background: #fdf0ef;
+  color: #8b5a59;
 }
 
 .export-summary {
@@ -387,7 +481,7 @@ body {
 
 .export-summary hr {
   border: none;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #e5e0d4;
   margin: 8px 0;
 }
 
@@ -402,8 +496,9 @@ body {
   color: white;
   padding: 12px 24px;
   border-radius: 30px;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
   transition: transform 0.3s ease;
   z-index: 999;
   white-space: nowrap;
@@ -424,10 +519,10 @@ body {
   gap: 8px;
   width: 100%;
   padding: 11px 14px;
-  border: 2px dashed #667eea;
+  border: 2px dashed #44A194;
   border-radius: 10px;
-  background: #f0f4ff;
-  color: #667eea;
+  background: #ecf5f3;
+  color: #44A194;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -437,7 +532,7 @@ body {
 }
 
 .scan-btn:hover {
-  background: #e8edff;
+  background: #dff0ed;
 }
 
 .scan-btn:active {
@@ -509,7 +604,7 @@ body {
   left: 10%;
   right: 10%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #667eea, transparent);
+  background: linear-gradient(90deg, transparent, #44A194, transparent);
   animation: scanMove 2s ease-in-out infinite;
   border-radius: 2px;
 }
@@ -526,7 +621,7 @@ body {
   position: absolute;
   width: 28px;
   height: 28px;
-  border-color: #667eea;
+  border-color: #44A194;
   border-style: solid;
   border-width: 0;
 }
@@ -557,7 +652,7 @@ body {
 
 .capture-btn:active {
   transform: scale(0.92);
-  background: #e2e8f0;
+  background: #e5e0d4;
 }
 
 .scanner-hint {
@@ -643,24 +738,28 @@ body {
   flex: 1;
   color: #4a5568;
   font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .legend-amount {
-  font-weight: 700;
+  font-weight: 800;
   color: #2d3748;
+  font-variant-numeric: tabular-nums;
 }
 
 .legend-pct {
   color: #a0aec0;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
+  font-weight: 500;
   min-width: 38px;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 
 /* ── Loans Category ───────────────────────────────────────── */
 
-.expense-item[data-category="Loans"] { border-left-color: #f6e05e; }
+.expense-item[data-category="Loans"] { border-left-color: #c4a96a; }
 
 
 /* ── Dropbox Section ──────────────────────────────────────── */
@@ -695,8 +794,8 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #f0fff4;
-  border: 1px solid #c6f6d5;
+  background: #ecf5f3;
+  border: 1px solid #b3dad3;
   border-radius: 10px;
   padding: 12px 14px;
   margin-bottom: 14px;
@@ -706,20 +805,21 @@ body {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #48bb78;
+  background: #44A194;
   flex-shrink: 0;
 }
 
 .dropbox-status span {
   flex: 1;
-  font-size: 0.87rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #276749;
+  color: #2d7a6f;
+  letter-spacing: 0.01em;
 }
 
 .dropbox-disconnect {
   font-size: 0.75rem;
-  color: #fc8181;
+  color: #EC8F8D;
   background: none;
   border: none;
   cursor: pointer;
@@ -728,11 +828,11 @@ body {
 }
 
 .dropbox-disconnect:hover {
-  color: #e53e3e;
+  color: #d4706e;
 }
 
 code {
-  background: #edf2f7;
+  background: #ebe7db;
   padding: 2px 5px;
   border-radius: 4px;
   font-size: 0.78rem;
