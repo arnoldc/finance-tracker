@@ -48,7 +48,7 @@
       <div class="form-group">
         <label class="form-label" for="inp-amount">Amount</label>
         <div class="amount-wrapper">
-          <span class="amount-prefix">$</span>
+          <span class="amount-prefix">₱</span>
           <input
             class="form-input"
             type="number"
@@ -71,6 +71,7 @@
           <option value="Health">💊 Health</option>
           <option value="Entertainment">🎬 Entertainment</option>
           <option value="Shopping">🛍️ Shopping</option>
+          <option value="Service">🧹 Service</option>
           <option value="Other">📦 Other</option>
         </select>
       </div>
@@ -112,17 +113,31 @@
     <!-- Stats Bar -->
     <div class="stats-bar">
       <div class="stat-card">
-        <div class="stat-value" id="stat-total">$0</div>
+        <div class="stat-value" id="stat-total">₱0</div>
         <div class="stat-label">Total</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" id="stat-today">$0</div>
+        <div class="stat-value" id="stat-today">₱0</div>
         <div class="stat-label">Today</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="stat-count">0</div>
         <div class="stat-label">Entries</div>
       </div>
+    </div>
+
+    <!-- Monthly Pie Chart -->
+    <div class="card chart-card">
+      <div class="chart-header">
+        <p class="card-title" style="margin-bottom:0">Monthly Breakdown</p>
+        <select class="form-select chart-month-select" id="chart-month" onchange="renderPieChart()">
+          <option value="">This month</option>
+        </select>
+      </div>
+      <div class="chart-container">
+        <canvas id="pie-chart"></canvas>
+      </div>
+      <div class="chart-legend" id="chart-legend"></div>
     </div>
 
     <!-- Filters -->
@@ -135,6 +150,7 @@
         <option value="Health">Health</option>
         <option value="Entertainment">Entertainment</option>
         <option value="Shopping">Shopping</option>
+        <option value="Service">Service</option>
         <option value="Other">Other</option>
       </select>
       <select class="form-select" id="filter-month" onchange="renderExpenseList()">
@@ -225,6 +241,7 @@
        SCRIPTS
        Tesseract.js loaded from CDN for OCR scanning
   ══════════════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/scanner.js"></script>

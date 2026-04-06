@@ -3,6 +3,19 @@
    ============================================================ */
 
 const STORAGE_KEY = 'expense_tracker_v1';
+const CURRENCY    = '₱';
+
+// Category colors — used by expense cards and the pie chart
+const CATEGORY_COLORS = {
+  Food:          '#f6ad55',
+  Transport:     '#68d391',
+  Bills:         '#fc8181',
+  Health:        '#76e4f7',
+  Entertainment: '#b794f4',
+  Shopping:      '#f687b3',
+  Service:       '#4fd1c5',
+  Other:         '#a0aec0',
+};
 
 
 /* ── Storage Helpers ──────────────────────────────────────── */
@@ -53,7 +66,9 @@ function showTab(tabName, clickedBtn) {
   // Run tab-specific setup
   if (tabName === 'list') {
     populateMonthFilter();
+    populateChartMonthFilter();
     renderExpenseList();
+    renderPieChart();
   }
 
   if (tabName === 'export') {
@@ -196,8 +211,8 @@ function updateStats() {
   const totalAll    = all.reduce((sum, e) => sum + e.amount, 0);
   const totalToday  = all.filter(e => e.date === today).reduce((sum, e) => sum + e.amount, 0);
 
-  document.getElementById('stat-total').textContent = '$' + totalAll.toFixed(2);
-  document.getElementById('stat-today').textContent = '$' + totalToday.toFixed(2);
+  document.getElementById('stat-total').textContent = CURRENCY + totalAll.toFixed(2);
+  document.getElementById('stat-today').textContent = CURRENCY + totalToday.toFixed(2);
   document.getElementById('stat-count').textContent = all.length;
 }
 
@@ -273,6 +288,109 @@ function clearAll() {
   renderExpenseList();
   renderExportSummary();
   showToast('All data cleared');
+}
+
+
+/* ── Pie Chart ────────────────────────────────────────────── */
+
+let pieChartInstance = null;
+
+function populateChartMonthFilter() {
+  const expenses = loadExpenses();
+  const months   = [...new Set(expenses.map(e => e.date.slice(0, 7)))].sort().reverse();
+
+  const select      = document.getElementById('chart-month');
+  const currentValue = select.value;
+
+  select.innerHTML = '<option value="">This month</option>';
+
+  months.forEach(month => {
+    const [year, mo] = month.split('-');
+    const label = new Date(year, mo - 1).toLocaleString('default', {
+      month: 'long', year: 'numeric'
+    });
+    const option = document.createElement('option');
+    option.value       = month;
+    option.textContent = label;
+    if (currentValue === month) option.selected = true;
+    select.appendChild(option);
+  });
+}
+
+function renderPieChart() {
+  const selectedMonth = document.getElementById('chart-month').value;
+  const currentMonth  = todayISO().slice(0, 7);
+  const filterMonth   = selectedMonth || currentMonth;
+
+  const expenses = loadExpenses().filter(e => e.date.startsWith(filterMonth));
+
+  // Tally by category
+  const totals = {};
+  expenses.forEach(e => {
+    totals[e.category] = (totals[e.category] || 0) + e.amount;
+  });
+
+  const labels     = Object.keys(totals);
+  const data       = Object.values(totals);
+  const colors     = labels.map(cat => CATEGORY_COLORS[cat] || '#a0aec0');
+  const grandTotal = data.reduce((s, v) => s + v, 0);
+
+  // Destroy previous chart instance before redrawing
+  if (pieChartInstance) {
+    pieChartInstance.destroy();
+    pieChartInstance = null;
+  }
+
+  const canvas = document.getElementById('pie-chart');
+  const legend = document.getElementById('chart-legend');
+
+  if (labels.length === 0) {
+    canvas.style.display = 'none';
+    legend.innerHTML = '<p class="chart-empty">No expenses for this month yet.</p>';
+    return;
+  }
+
+  canvas.style.display = 'block';
+
+  pieChartInstance = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors,
+        borderWidth: 2,
+        borderColor: '#ffffff',
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const pct = ((ctx.parsed / grandTotal) * 100).toFixed(1);
+              return ` ${CURRENCY}${ctx.parsed.toLocaleString('en-PH', { minimumFractionDigits: 2 })}  (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Custom legend
+  legend.innerHTML = labels.map((cat, i) => {
+    const pct = ((data[i] / grandTotal) * 100).toFixed(1);
+    return `
+      <div class="legend-item">
+        <span class="legend-dot" style="background:${colors[i]}"></span>
+        <span class="legend-label">${cat}</span>
+        <span class="legend-amount">${CURRENCY}${data[i].toLocaleString('en-PH', { minimumFractionDigits: 2 })}</span>
+        <span class="legend-pct">${pct}%</span>
+      </div>`;
+  }).join('');
 }
 
 
