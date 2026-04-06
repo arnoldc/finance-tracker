@@ -213,3 +213,86 @@ async function exportToDropbox() {
     showToast('❌ Could not reach Dropbox. Check your connection.');
   }
 }
+
+
+/* ── Import CSV from Dropbox ─────────────────────────────── */
+
+async function importFromDropbox() {
+  const token = localStorage.getItem(DROPBOX_TOKEN_KEY);
+
+  if (!token) {
+    showToast('Please connect Dropbox first');
+    return;
+  }
+
+  // Build file path matching the export convention
+  const rawFolder = (document.getElementById('dropbox-folder').value || 'ExpenseTracker').trim();
+  const folder    = '/' + rawFolder.replace(/^\/+/, '').replace(/\/+$/, '');
+
+  showToast('⏳ Fetching file list from Dropbox...');
+
+  try {
+    // List CSV files in the folder
+    const listRes = await fetch('https://api.dropboxapi.com/2/files/list_folder', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type':  'application/json'
+      },
+      body: JSON.stringify({ path: folder, limit: 100 })
+    });
+
+    if (!listRes.ok) {
+      if (listRes.status === 401) {
+        localStorage.removeItem(DROPBOX_TOKEN_KEY);
+        updateDropboxUI();
+        showToast('❌ Session expired. Please reconnect Dropbox.');
+      } else if (listRes.status === 409) {
+        showToast('❌ Folder not found. Check the folder name.');
+      } else {
+        showToast(`❌ Could not list folder (${listRes.status})`);
+      }
+      return;
+    }
+
+    const listData = await listRes.json();
+    const csvFiles = (listData.entries || [])
+      .filter(e => e['.tag'] === 'file' && e.name.toLowerCase().endsWith('.csv'))
+      .sort((a, b) => b.name.localeCompare(a.name)); // newest first by filename
+
+    if (csvFiles.length === 0) {
+      showToast('No CSV files found in ' + folder);
+      return;
+    }
+
+    // Download the most recent CSV
+    const targetFile = csvFiles[0];
+    showToast(`⏳ Loading ${targetFile.name}...`);
+
+    const dlRes = await fetch('https://content.dropboxapi.com/2/files/download', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Dropbox-API-Arg': JSON.stringify({ path: targetFile.path_lower })
+      }
+    });
+
+    if (!dlRes.ok) {
+      showToast(`❌ Download failed (${dlRes.status})`);
+      return;
+    }
+
+    const csvText = await dlRes.text();
+    const result  = importCSVText(csvText);
+
+    if (result.added > 0) {
+      showToast(`✅ Imported ${result.added} expense${result.added > 1 ? 's' : ''} from ${targetFile.name}`);
+    } else {
+      showToast(result.error || `No new expenses in ${targetFile.name} (all duplicates)`);
+    }
+
+  } catch (err) {
+    console.error('Dropbox import error:', err);
+    showToast('❌ Could not reach Dropbox. Check your connection.');
+  }
+}

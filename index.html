@@ -20,6 +20,13 @@
     <p>Track your daily expenses — export to Excel anytime</p>
   </header>
 
+  <!-- Mobile shortcut tip -->
+  <div class="tip-banner" id="tip-banner">
+    <span>📱 <strong>Tip:</strong> Add this page to your Home Screen to use it like an app!<br>
+    <small>Safari → Share → <em>Add to Home Screen</em> &nbsp;|&nbsp; Chrome → ⋮ → <em>Add to Home screen</em></small></span>
+    <button class="tip-close" onclick="dismissTip()" aria-label="Close tip">✕</button>
+  </div>
+
 
   <!-- ══════════════════════════════════════════════
        TAB NAVIGATION
@@ -186,6 +193,19 @@
       <button class="btn btn-success" onclick="exportCSV()">📥 Download CSV</button>
     </div>
 
+    <!-- Import CSV -->
+    <div class="card">
+      <p class="card-title">Load CSV</p>
+
+      <div class="info-box blue">
+        📂 Restore expenses from a previously exported CSV file.<br>
+        Duplicate entries (same date, amount, category, description) will be skipped.
+      </div>
+
+      <input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="importCSV(this)" />
+      <button class="btn btn-primary" onclick="document.getElementById('csv-file-input').click()">📤 Load CSV File</button>
+    </div>
+
     <!-- Dropbox -->
     <div class="card">
       <p class="card-title">Save to Dropbox</p>
@@ -220,6 +240,7 @@
           <input class="form-input" type="text" id="dropbox-folder" value="/ExpenseTracker" placeholder="/ExpenseTracker" />
         </div>
         <button class="btn btn-dropbox" onclick="exportToDropbox()">☁️ Save CSV to Dropbox</button>
+        <button class="btn btn-dropbox" style="margin-top:10px; background:#537D96" onclick="importFromDropbox()">📂 Load CSV from Dropbox</button>
       </div>
     </div>
 

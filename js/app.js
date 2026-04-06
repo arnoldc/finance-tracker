@@ -8,7 +8,26 @@ const APP_STORAGE_KEYS = [
   STORAGE_KEY,
   'dropbox_access_token',
   'dropbox_app_key',
+  'tip_dismissed',
 ];
+
+
+/* ── Tip Banner ────────────────────────────────────────── */
+
+function dismissTip() {
+  const banner = document.getElementById('tip-banner');
+  if (banner) banner.style.display = 'none';
+  localStorage.setItem('tip_dismissed', '1');
+}
+
+(function initTip() {
+  if (localStorage.getItem('tip_dismissed') === '1') {
+    document.addEventListener('DOMContentLoaded', () => {
+      const banner = document.getElementById('tip-banner');
+      if (banner) banner.style.display = 'none';
+    });
+  }
+})();
 
 // Category colors — used by expense cards and the pie chart
 const CATEGORY_COLORS = {
@@ -302,6 +321,101 @@ function exportCSV() {
 
   URL.revokeObjectURL(url);
   showToast('✅ CSV downloaded!');
+}
+
+
+/* ── Import CSV ───────────────────────────────────────────── */
+
+function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const result = importCSVText(e.target.result);
+    input.value = '';
+    if (result.added > 0) {
+      showToast(`✅ Imported ${result.added} expense${result.added > 1 ? 's' : ''}`);
+    } else {
+      showToast(result.error || 'No new expenses found (all duplicates or empty)');
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+/* Shared CSV text importer — used by file import and Dropbox import */
+function importCSVText(text) {
+  text = (text || '').trim();
+  const lines = text.split(/\r?\n/);
+
+  if (lines.length < 2) {
+    return { added: 0, error: 'CSV file is empty or has no data rows' };
+  }
+
+  const dataLines = lines.slice(1);
+  const existing  = loadExpenses();
+  let added = 0;
+
+  dataLines.forEach(line => {
+    const cols = parseCSVLine(line);
+    if (cols.length < 4) return;
+
+    const date     = (cols[0] || '').trim();
+    const amount   = parseFloat(cols[1]);
+    const category = (cols[2] || '').trim();
+    const payment  = (cols[3] || '').trim();
+    const desc     = (cols[4] || '').trim();
+
+    if (!date || !amount || amount <= 0 || !category) return;
+
+    const isDuplicate = existing.some(ex =>
+      ex.date === date &&
+      ex.amount === amount &&
+      ex.category === category &&
+      (ex.desc || '') === desc
+    );
+
+    if (!isDuplicate) {
+      existing.push({ id: Date.now() + added, date, amount, category, payment: payment || 'Cash', desc });
+      added++;
+    }
+  });
+
+  saveExpenses(existing);
+  return { added };
+}
+
+/* Parse a single CSV line, respecting quoted fields */
+function parseCSVLine(line) {
+  const cols = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') {
+        current += '"';
+        i++; // skip escaped quote
+      } else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        current += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        cols.push(current);
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+  }
+  cols.push(current);
+  return cols;
 }
 
 
