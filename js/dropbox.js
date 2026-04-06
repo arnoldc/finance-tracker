@@ -276,15 +276,22 @@ async function importFromDropbox() {
     const targetFile = csvFiles[0];
     showToast(`⏳ Loading ${targetFile.name}...`);
 
+    // Dropbox-API-Arg must use ASCII-safe JSON (escape non-ASCII)
+    const apiArg = JSON.stringify({ path: targetFile.path_lower || targetFile.path_display })
+      .replace(/[\u007f-\uffff]/g, c => '\\u' + ('0000' + c.charCodeAt(0).toString(16)).slice(-4));
+
     const dlRes = await fetch('https://content.dropboxapi.com/2/files/download', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Dropbox-API-Arg': JSON.stringify({ path: targetFile.path_lower })
+        'Authorization':   `Bearer ${token}`,
+        'Content-Type':    'application/octet-stream',
+        'Dropbox-API-Arg': apiArg
       }
     });
 
     if (!dlRes.ok) {
+      const errText = await dlRes.text();
+      console.error('Dropbox download error:', dlRes.status, errText);
       showToast(`❌ Download failed (${dlRes.status})`);
       return;
     }
