@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════ -->
+  <header class="app-header">
+    <h1>💸 Expense Tracker</h1>
+    <p>Track your daily expenses — export to Excel anytime</p>
+  </header>
+
+
+  <!-- ══════════════════════════════════════════════
+       TAB NAVIGATION
+  ══════════════════════════════════════════════ -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('add', this)">➕ Add</button>
+    <button class="tab-btn"        onclick="showTab('list', this)">📋 History</button>
+    <button class="tab-btn"        onclick="showTab('export', this)">📤 Export</button>
+  </nav>
+
+
+  <!-- ══════════════════════════════════════════════
+       TAB: ADD EXPENSE
+  ══════════════════════════════════════════════ -->
+  <section id="tab-add" class="section active">
+
+    <div class="card">
+      <p class="card-title">New Expense</p>
+
+      <!-- Receipt Scanner Button -->
+      <button class="scan-btn" onclick="openScanner()">
+        📷 Scan Receipt to Auto-fill Amount
+      </button>
+
+      <div class="form-group">
+        <label class="form-label" for="inp-date">Date</label>
+        <input class="form-input" type="date" id="inp-date" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="inp-amount">Amount</label>
+        <div class="amount-wrapper">
+          <span class="amount-prefix">$</span>
+          <input
+            class="form-input"
+            type="number"
+            id="inp-amount"
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+            inputmode="decimal"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="inp-category">Category</label>
+        <select class="form-select" id="inp-category">
+          <option value="">Select a category...</option>
+          <option value="Food">🍔 Food &amp; Dining</option>
+          <option value="Transport">🚗 Transport</option>
+          <option value="Bills">💡 Bills &amp; Utilities</option>
+          <option value="Health">💊 Health</option>
+          <option value="Entertainment">🎬 Entertainment</option>
+          <option value="Shopping">🛍️ Shopping</option>
+          <option value="Other">📦 Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="inp-payment">Payment Method</label>
+        <select class="form-select" id="inp-payment">
+          <option value="Cash">💵 Cash</option>
+          <option value="Credit Card">💳 Credit Card</option>
+          <option value="Debit Card">🏦 Debit Card</option>
+          <option value="Bank Transfer">🔁 Bank Transfer</option>
+          <option value="Other">📱 Other / E-wallet</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="inp-desc">
+          Description
+          <span style="font-weight:400; text-transform:none;">(optional)</span>
+        </label>
+        <textarea
+          class="form-textarea"
+          id="inp-desc"
+          placeholder="e.g. Lunch at the restaurant..."
+        ></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="addExpense()">Save Expense</button>
+    </div>
+
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════
+       TAB: HISTORY
+  ══════════════════════════════════════════════ -->
+  <section id="tab-list" class="section">
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">$0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-today">$0</div>
+        <div class="stat-label">Today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-count">0</div>
+        <div class="stat-label">Entries</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <select class="form-select" id="filter-cat" onchange="renderExpenseList()">
+        <option value="">All categories</option>
+        <option value="Food">Food</option>
+        <option value="Transport">Transport</option>
+        <option value="Bills">Bills</option>
+        <option value="Health">Health</option>
+        <option value="Entertainment">Entertainment</option>
+        <option value="Shopping">Shopping</option>
+        <option value="Other">Other</option>
+      </select>
+      <select class="form-select" id="filter-month" onchange="renderExpenseList()">
+        <option value="">All months</option>
+      </select>
+    </div>
+
+    <!-- Expense List -->
+    <div class="expense-list" id="expense-list"></div>
+
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════
+       TAB: EXPORT
+  ══════════════════════════════════════════════ -->
+  <section id="tab-export" class="section">
+
+    <div class="card">
+      <p class="card-title">Export to Excel</p>
+
+      <div class="info-box blue">
+        📌 <strong>How it works</strong><br>
+        1. Tap <em>Export CSV</em> to download your expenses<br>
+        2. Open Excel → Data → From Text/CSV<br>
+        3. Select the downloaded file → Load<br>
+        Your data will appear ready to use!
+      </div>
+
+      <button class="btn btn-success" onclick="exportCSV()">📥 Export All as CSV</button>
+      <button class="btn btn-danger"  onclick="clearAll()">🗑️ Clear All Data</button>
+
+      <div class="info-box yellow" style="margin-top: 14px;">
+        ⚠️ Data is stored on this device only. Export regularly to avoid data loss.
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">Spending Summary</p>
+      <div class="export-summary" id="export-summary"></div>
+    </div>
+
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════
+       RECEIPT SCANNER MODAL
+  ══════════════════════════════════════════════ -->
+  <div class="scanner-overlay" id="scanner-overlay">
+
+    <div class="scanner-header">
+      <h2>📷 Scan Receipt</h2>
+      <button class="scanner-close" onclick="closeScanner()">✕</button>
+    </div>
+
+    <!-- Live camera view -->
+    <div class="scanner-viewfinder">
+      <video id="scanner-video" autoplay playsinline muted></video>
+
+      <!-- Visual guides -->
+      <div class="scan-line"></div>
+      <div class="scan-corner tl"></div>
+      <div class="scan-corner tr"></div>
+      <div class="scan-corner bl"></div>
+      <div class="scan-corner br"></div>
+    </div>
+
+    <!-- Hidden canvas for frame capture -->
+    <canvas id="scanner-canvas"></canvas>
+
+    <p class="scanner-status" id="scanner-status">Point camera at your receipt</p>
+
+    <div class="scanner-footer">
+      <button class="capture-btn" id="capture-btn" onclick="captureAndScan()"></button>
+      <p class="scanner-hint">Tap the button to scan · Make sure the total is visible</p>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════
+       TOAST NOTIFICATION
+  ══════════════════════════════════════════════ -->
+  <div class="toast" id="toast"></div>
+
+
+  <!-- ══════════════════════════════════════════════
+       SCRIPTS
+       Tesseract.js loaded from CDN for OCR scanning
+  ══════════════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/scanner.js"></script>
+
+</body>
+</html>
