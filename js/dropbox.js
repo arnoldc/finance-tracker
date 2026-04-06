@@ -171,22 +171,29 @@ async function exportToDropbox() {
   showToast('⏳ Uploading to Dropbox...');
 
   try {
-    const dbx = new Dropbox.Dropbox({ accessToken: token });
+    const dbx  = new Dropbox.Dropbox({ accessToken: token });
+
+    // Dropbox SDK requires a Blob in browser environments, not a raw string
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 
     await dbx.filesUpload({
       path:       filePath,
       mode:       { '.tag': 'overwrite' },
-      contents:   csvContent
+      autorename: false,
+      mute:       false,
+      contents:   blob
     });
 
     showToast(`✅ Saved to Dropbox: ${filePath}`);
   } catch (err) {
     console.error('Dropbox upload error:', err);
 
-    if (err.status === 401) {
+    if (err?.status === 401) {
       localStorage.removeItem(DROPBOX_TOKEN_KEY);
       updateDropboxUI();
       showToast('❌ Session expired. Please reconnect Dropbox.');
+    } else if (err?.status === 409) {
+      showToast('❌ Folder path not found. Check the folder name.');
     } else {
       showToast('❌ Upload failed. Check your folder path and try again.');
     }
