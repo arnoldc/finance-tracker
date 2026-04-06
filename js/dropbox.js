@@ -30,6 +30,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+/* ── Toggle App Key Field ─────────────────────────────────── */
+
+function toggleDropboxKeyField() {
+  const field  = document.getElementById('dropbox-key-field');
+  const isOpen = field.style.display !== 'none';
+
+  if (isOpen) {
+    // Field is visible — attempt to connect
+    connectDropbox();
+  } else {
+    // Show the field and change button label
+    field.style.display = 'block';
+    document.querySelector('#dropbox-setup .btn-dropbox').textContent = 'Submit & Connect';
+    document.getElementById('dropbox-app-key').focus();
+  }
+}
+
+
 /* ── OAuth: Connect ───────────────────────────────────────── */
 
 function connectDropbox() {

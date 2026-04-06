@@ -197,11 +197,11 @@
           &nbsp;&nbsp;<code id="redirect-uri-display" style="font-size:0.78rem;word-break:break-all"></code><br>
           4. Copy your <strong>App Key</strong> and paste it below
         </div>
-        <div class="form-group">
+        <div class="form-group" id="dropbox-key-field" style="display:none">
           <label class="form-label" for="dropbox-app-key">Dropbox App Key</label>
           <input class="form-input" type="text" id="dropbox-app-key" placeholder="Paste your App Key here..." />
         </div>
-        <button class="btn btn-dropbox" onclick="connectDropbox()">Connect Dropbox</button>
+        <button class="btn btn-dropbox" onclick="toggleDropboxKeyField()">Connect Dropbox</button>
       </div>
 
       <!-- State B: connected -->
