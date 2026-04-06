@@ -163,10 +163,11 @@ async function exportToDropbox() {
 
   const csvContent = [headers.join(','), ...rows].join('\n');
 
-  // Build file path
-  const folder   = (document.getElementById('dropbox-folder').value || '/ExpenseTracker').trim();
-  const fileName = `expenses_${todayISO()}.csv`;
-  const filePath = folder.replace(/\/$/, '') + '/' + fileName;
+  // Build file path — ensure it always starts with /
+  const rawFolder = (document.getElementById('dropbox-folder').value || 'ExpenseTracker').trim();
+  const folder    = '/' + rawFolder.replace(/^\/+/, '').replace(/\/+$/, '');
+  const fileName  = `expenses_${todayISO()}.csv`;
+  const filePath  = folder + '/' + fileName;
 
   showToast('⏳ Uploading to Dropbox...');
 
@@ -180,7 +181,7 @@ async function exportToDropbox() {
         'Content-Type':    'application/octet-stream',
         'Dropbox-API-Arg': JSON.stringify({
           path:       filePath,
-          mode:       'overwrite',
+          mode:       { '.tag': 'overwrite' },
           autorename: false,
           mute:       false
         })
